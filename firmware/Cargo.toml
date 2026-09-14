@@ -102,6 +102,7 @@ keebxpansion = "0.1.0"
 nfcxpansion = "0.1.1"
 
 # Apps
+doom-app = { version = "0.1.0" }
 button-logger = { path = "./apps/button-logger/" }
 cube-game = { path = "./apps/cube-game/" }
 neon-beat = { path = "./apps/neon-beat/" }

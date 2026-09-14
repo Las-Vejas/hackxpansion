@@ -7,6 +7,11 @@ use xpanse_api::{app::App, registry::Registry};
 
 const APP_CATALOG: &[AppDescriptor] = &[
     AppDescriptor {
+        name: doom_app::DoomApp::NAME,
+        can_run: doom_app::DoomApp::can_run,
+        run: run_app_impl::<doom_app::DoomApp>,
+    },
+    AppDescriptor {
         name: button_logger::ButtonLoggerApp::NAME,
         can_run: button_logger::ButtonLoggerApp::can_run,
         run: run_app_impl::<button_logger::ButtonLoggerApp>,

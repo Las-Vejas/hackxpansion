@@ -3,3 +3,15 @@
 hardware/modules/hdmi/hdmi/.history
 
 hardware/modules/linux_soc/pcb/.history
+
+# Rust build artifacts (workspace + vendored app crates)
+target/
+firmware/target/
+
+# Editor / IDE junk
+.vscode/
+.idea/
+*.swp
+*~
+*.orig
+*.rej

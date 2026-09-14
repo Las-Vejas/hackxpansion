@@ -71,6 +71,7 @@ keebxpansion = { workspace = true }
 nfcxpansion = { workspace = true }
 
 # Apps
+doom-app = { workspace = true }
 button-logger = { workspace = true }
 cube-game = { workspace = true }
 neon-beat = { workspace = true }

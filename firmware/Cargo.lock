@@ -1313,6 +1313,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "doom-app"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "797bd2592e07240bb16bd913c39154c62324ec736a6bc131d18e921de19540c9"
+dependencies = [
+ "tinydoom",
+ "xpanse-api 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "dpi"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3513,6 +3523,12 @@ dependencies = [
  "lyon_geom",
  "num-traits",
 ]
+
+[[package]]
+name = "lz4_flex"
+version = "0.11.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "373f5eceeeab7925e0c1098212f2fbc4d416adec9d35051a6ab251e824c1854a"
 
 [[package]]
 name = "managed"
@@ -5940,6 +5956,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "tinydoom"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "745be13d0043709a931427a45b04232b3b72856639ee31a4abae75acd57f37c1"
+dependencies = [
+ "defmt 1.1.1",
+ "libm",
+ "lz4_flex",
+ "wadtool",
+]
+
+[[package]]
 name = "tinystr"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6384,6 +6412,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
+]
+
+[[package]]
+name = "wadtool"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c66ff3b67b59b4013e32e1f0d100cfbc4063c206eccaef3e228d3523a6cf4e70"
+dependencies = [
+ "lz4_flex",
 ]
 
 [[package]]
@@ -6949,6 +6986,7 @@ dependencies = [
  "defmt-rtt",
  "display-interface",
  "display-interface-spi",
+ "doom-app",
  "embassy-embedded-hal",
  "embassy-executor",
  "embassy-futures",
