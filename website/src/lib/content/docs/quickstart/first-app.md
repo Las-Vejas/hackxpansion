@@ -248,6 +248,45 @@ impl App for ButtonLoggerApp {
 }
 ```
 
+## Enabling apps with feature flags
+
+Every app in the firmware sits behind its own Cargo feature flag on the `xpanse` crate, so only the apps you enable get compiled into the console image. This keeps flash usage down (important for heavy apps like emulators) and lets contributors test one app in isolation.
+
+The convention is `app-<crate-name>`. The current flags are:
+
+```toml
+[features]
+default = ["app-neon-beat", "app-snake-game"]
+app-button-logger = ["dep:button-logger"]
+app-cube-game = ["dep:cube-game"]
+app-neon-beat = ["dep:neon-beat"]
+app-snake-game = ["dep:snake-game"]
+app-nes-emulator = ["dep:nes-emulator"]
+app-doom = ["dep:doom-app"]
+```
+
+(The doom crate is called `doom-app`, so its flag is shortened to `app-doom`.)
+
+Each dependency in `firmware/xpanse/Cargo.toml` is marked `optional = true`, and each entry in `APP_CATALOG` (`firmware/xpanse/src/app_loader.rs`) is gated with `#[cfg(feature = "...")]`. An app only shows up in the on-console app picker if its feature is enabled at compile time **and** its `can_run()` check passes at runtime (i.e. the required modules are plugged in).
+
+Useful build commands (run from the `firmware` folder):
+
+```sh
+cargo build -p xpanse
+# default build: Neon Beat + Snake only
+
+cargo build -p xpanse --no-default-features --features app-my-app
+# build with only your app, for fast iteration
+
+cargo build -p xpanse --no-default-features --features app-neon-beat,app-snake-game,app-my-app
+# your app plus the defaults
+
+cargo build -p xpanse --all-features
+# every app
+```
+
+Only the default apps ship on the console. If you want your app enabled by default, mention it in your PR and explain why — most new apps should start as opt-in.
+
 ## Adding your app to the firmware
 
 If you followed the driver guide, you should already have a fork and local clone of the main hackxpansion repo. Adding an app is almost the exact process as adding a driver. Here are the steps:
@@ -260,15 +299,25 @@ If you followed the driver guide, you should already have a fork and local clone
 my-app = { path = "../../my-app" } # This could also be an absolute path
 ```
 
-4. Add the workspace dependency under `# Apps` in [`firmware/xpanse/Cargo.toml`](https://github.com/hackclub/hackxpansion/blob/main/firmware/xpanse/Cargo.toml):
+4. Add the workspace dependency under `# Apps` in [`firmware/xpanse/Cargo.toml`](https://github.com/hackclub/hackxpansion/blob/main/firmware/xpanse/Cargo.toml), marked as `optional` so it is only compiled when its feature is enabled:
 
 ```toml
-my-app = { workspace = true }
+my-app = { workspace = true, optional = true }
 ```
 
-5. Add your app to `APP_CATALOG` in [`app_loader.rs`](https://github.com/hackclub/hackxpansion/blob/main/firmware/xpanse/src/app_loader.rs), following the existing apps:
+5. Add a feature flag for your app in the `[features]` section of `firmware/xpanse/Cargo.toml`, following the `app-<crate-name>` convention. Do not add it to `default` unless you have a good reason — most new apps should be opt-in:
+
+```toml
+[features]
+default = ["app-neon-beat", "app-snake-game"]
+# ...
+app-my-app = ["dep:my-app"]
+```
+
+6. Add your app to `APP_CATALOG` in [`app_loader.rs`](https://github.com/hackclub/hackxpansion/blob/main/firmware/xpanse/src/app_loader.rs), gated behind your feature flag and following the existing apps:
 
 ```rust
+#[cfg(feature = "app-my-app")]
 AppDescriptor {
     name: my_app::MyApp::NAME,
     can_run: my_app::MyApp::can_run,
@@ -278,16 +327,21 @@ AppDescriptor {
 
 Rust crate names use underscores in code, so a crate named `my-app` in `Cargo.toml` is imported as `my_app`.
 
-6. Build the firmware by running `cargo build` from the `firmware` folder.
-7. Fix any compilation errors, then publish your app crate on [crates.io](https://crates.io).
-8. Replace the local path dependency in `firmware/Cargo.toml` with the version published on crates.io:
+7. Build the firmware with only your app enabled by running this from the `firmware` folder:
+
+```sh
+cargo build -p xpanse --no-default-features --features app-my-app
+```
+
+8. Fix any compilation errors, then publish your app crate on [crates.io](https://crates.io).
+9. Replace the local path dependency in `firmware/Cargo.toml` with the version published on crates.io:
 
 ```toml
 my-app = "0.1.0"
 ```
 
-9. Run `cargo build` again to make sure the firmware builds with the published crate.
-10. Make a PR to the hackxpansion repo with your app dependency and `APP_CATALOG` entry.
-11. When your modules and console arrive, test the app on the real hardware and fix any bugs.
-12. Publish a new version of your app on crates.io if fixes are needed.
-13. Make another PR to the hackxpansion repo with the bumped app version.
+10. Run `cargo build -p xpanse --no-default-features --features app-my-app` again to make sure the firmware builds with the published crate. Also run a default `cargo build -p xpanse` to make sure you didn't break the default app set.
+11. Make a PR to the hackxpansion repo with your app dependency, feature flag, and `APP_CATALOG` entry.
+12. When your modules and console arrive, test the app on the real hardware and fix any bugs.
+13. Publish a new version of your app on crates.io if fixes are needed.
+14. Make another PR to the hackxpansion repo with the bumped app version.
