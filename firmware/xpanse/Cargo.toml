@@ -70,13 +70,22 @@ pn532-driver = { workspace = true }
 keebxpansion = { workspace = true }
 nfcxpansion = { workspace = true }
 
-# Apps
-doom-app = { workspace = true }
-button-logger = { workspace = true }
-cube-game = { workspace = true }
-neon-beat = { workspace = true }
-snake-game = { workspace = true }
-nes-emulator = { workspace = true }
+# Apps (each behind an `app-*` feature flag)
+doom-app = { workspace = true, optional = true }
+button-logger = { workspace = true, optional = true }
+cube-game = { workspace = true, optional = true }
+neon-beat = { workspace = true, optional = true }
+snake-game = { workspace = true, optional = true }
+nes-emulator = { workspace = true, optional = true }
+
+[features]
+default = ["app-neon-beat", "app-snake-game"]
+app-button-logger = ["dep:button-logger"]
+app-cube-game = ["dep:cube-game"]
+app-neon-beat = ["dep:neon-beat"]
+app-snake-game = ["dep:snake-game"]
+app-nes-emulator = ["dep:nes-emulator"]
+app-doom = ["dep:doom-app"]
 
 [build-dependencies]
 slint-build = { workspace = true }
