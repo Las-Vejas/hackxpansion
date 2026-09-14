@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getShopEligibility, HACKXPANSION_CONSOLE, isShopItemUnlocked } from './domain';
+import { getShopEligibility, HACKXPANSION_CONSOLE } from './domain';
 
 describe('shop eligibility', () => {
 	it('requires four accepted module designs and one accepted app design for the console', () => {
@@ -27,10 +27,16 @@ describe('shop eligibility', () => {
 		});
 	});
 
-	it('keeps the console available and unlocks other items after a console order', () => {
-		expect(isShopItemUnlocked(HACKXPANSION_CONSOLE.id, false)).toBe(true);
-		expect(isShopItemUnlocked('accessory', false)).toBe(false);
-		expect(isShopItemUnlocked('accessory', true)).toBe(true);
-		expect(isShopItemUnlocked(HACKXPANSION_CONSOLE.id, true)).toBe(true);
+	it('lets other shop items be ordered without design approvals', () => {
+		expect(
+			getShopEligibility(
+				{ requiredModuleDesigns: 0, requiredAppDesigns: 0 },
+				{ moduleDesigns: 0, appDesigns: 0 }
+			)
+		).toEqual({
+			eligible: true,
+			missingModuleDesigns: 0,
+			missingAppDesigns: 0
+		});
 	});
 });

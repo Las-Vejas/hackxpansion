@@ -86,13 +86,11 @@
 										class="mt-auto cursor-not-allowed bg-slate-400 px-4 py-3 font-bold text-white"
 										disabled
 									>
-										{!item.unlocked
-											? 'Buy a console to unlock'
-											: item.eligibility.eligible
-												? data.balance >= item.price
-													? 'Place order'
-													: `Need ${item.price - data.balance} more currency`
-												: missingApprovalText(item)}
+										{item.eligibility.eligible
+											? data.balance >= item.price
+												? 'Place order'
+												: `Need ${item.price - data.balance} more currency`
+											: missingApprovalText(item)}
 									</button>
 								{/if}
 							{:else}

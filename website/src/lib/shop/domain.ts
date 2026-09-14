@@ -21,10 +21,6 @@ export const HACKXPANSION_CONSOLE = {
 	sortOrder: 0
 } as const;
 
-export function isShopItemUnlocked(itemId: string, hasConsoleOrder: boolean) {
-	return itemId === HACKXPANSION_CONSOLE.id || hasConsoleOrder;
-}
-
 export function getShopEligibility(requirements: ShopRequirements, progress: ShopProgress) {
 	const missingModuleDesigns = Math.max(
 		0,

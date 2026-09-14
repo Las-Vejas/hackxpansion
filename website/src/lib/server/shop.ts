@@ -6,7 +6,6 @@ import { project, shopItem, shopOrder, user } from '$lib/server/db/schema';
 import {
 	getShopEligibility,
 	HACKXPANSION_CONSOLE,
-	isShopItemUnlocked,
 	type ShopProgress
 } from '$lib/shop/domain';
 import type { CatalogItemInput } from '$lib/shop/catalog';
@@ -26,7 +25,7 @@ export class ShopError extends Error {
 }
 
 export async function getShopCatalog(userId?: string) {
-	const [databaseItems, progress, balance, hasConsoleOrder] = await Promise.all([
+	const [databaseItems, progress, balance] = await Promise.all([
 		db
 			.select()
 			.from(shopItem)
@@ -40,33 +39,30 @@ export async function getShopCatalog(userId?: string) {
 					.where(eq(user.id, userId))
 					.limit(1)
 					.then((rows) => rows[0]?.currency ?? 0)
-			: Promise.resolve(0),
-		userId ? hasOrderedConsole(userId) : Promise.resolve(false)
+			: Promise.resolve(0)
 	]);
 	const items = [HACKXPANSION_CONSOLE, ...databaseItems];
 
 	return {
 		balance,
 		progress,
-		shopUnlocked: hasConsoleOrder,
-		items: items.map((item) => ({
-			...item,
-			requiredModuleDesigns:
-				item.id === HACKXPANSION_CONSOLE.id ? HACKXPANSION_CONSOLE.requiredModuleDesigns : 0,
-			requiredAppDesigns:
-				item.id === HACKXPANSION_CONSOLE.id ? HACKXPANSION_CONSOLE.requiredAppDesigns : 0,
-			eligibility:
+		shopUnlocked: true,
+		items: items.map((item) => {
+			const eligibility =
 				item.id === HACKXPANSION_CONSOLE.id
 					? getShopEligibility(HACKXPANSION_CONSOLE, progress)
-					: getShopEligibility({ requiredModuleDesigns: 0, requiredAppDesigns: 0 }, progress),
-			unlocked: isShopItemUnlocked(item.id, hasConsoleOrder),
-			canOrder:
-				Boolean(userId) &&
-				item.price <= balance &&
-				isShopItemUnlocked(item.id, hasConsoleOrder) &&
-				(item.id !== HACKXPANSION_CONSOLE.id ||
-					getShopEligibility(HACKXPANSION_CONSOLE, progress).eligible)
-		}))
+					: getShopEligibility({ requiredModuleDesigns: 0, requiredAppDesigns: 0 }, progress);
+			return {
+				...item,
+				requiredModuleDesigns:
+					item.id === HACKXPANSION_CONSOLE.id ? HACKXPANSION_CONSOLE.requiredModuleDesigns : 0,
+				requiredAppDesigns:
+					item.id === HACKXPANSION_CONSOLE.id ? HACKXPANSION_CONSOLE.requiredAppDesigns : 0,
+				eligibility,
+				unlocked: true,
+				canOrder: Boolean(userId) && item.price <= balance && eligibility.eligible
+			};
+		})
 	};
 }
 
@@ -126,8 +122,6 @@ export async function createShopOrder(userId: string, itemId: string, rawNotes: 
 			if (!eligibility.eligible) {
 				throw new ShopError(422, eligibilityMessage(eligibility));
 			}
-		} else if (!(await hasOrderedConsole(userId, tx))) {
-			throw new ShopError(422, 'Buy the Hackxpansion Console before ordering other shop items.');
 		}
 
 		const [chargedUser] = await tx
@@ -290,15 +284,6 @@ async function getShopProgress(userId: string) {
 		.from(project)
 		.where(and(eq(project.userId, userId), eq(project.designCurrencyAwarded, true)));
 	return countAcceptedDesigns(rows);
-}
-
-async function hasOrderedConsole(userId: string, database: Pick<typeof db, 'select'> = db) {
-	const rows = await database
-		.select({ id: shopOrder.id })
-		.from(shopOrder)
-		.where(and(eq(shopOrder.userId, userId), eq(shopOrder.itemId, HACKXPANSION_CONSOLE.id)))
-		.limit(1);
-	return rows.length > 0;
 }
 
 function optionalNote(value: string, label: string) {
