@@ -67,6 +67,8 @@ two-button-driver = { workspace = true }
 four-button-driver = { workspace = true }
 keebxpansion = { workspace = true }
 nfcxpansion = { workspace = true }
+qwertyxpansion-driver = { workspace = true }
+sensexpansion-driver = { workspace = true }
 
 # Apps
 button-logger = { workspace = true }

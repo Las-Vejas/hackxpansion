@@ -1,6 +1,6 @@
 use xpanse_api::{
     bus::allocator::BusAllocator,
-    driver::{Driver, DriverMeta},
+    driver::{Driver, DriverMeta, DualSlotDriver},
     gpio_bank::{BankPins, GpioBank},
     metadata::{ModuleID, ModuleSlot},
     registry::Registry,
@@ -99,6 +99,14 @@ async fn load_driver<G: BankPins>(
                 }
             }
         }
+        Some(id) if id == sensexpansion_driver::EnvSenseDriver::ID => {
+            match sensexpansion_driver::EnvSenseDriver::create(bank, slot, registry, bus).await {
+                Ok(()) => defmt::info!("Sense driver initialized in {:?}", slot),
+                Err(error) => {
+                    defmt::error!("Sense driver init failed in {:?}: {:?}", slot, error)
+                }
+            }
+        }
         Some(id) => defmt::warn!("unknown driver id {:?} in {:?}", id, slot),
         None => defmt::info!("no driver to load in {:?}", slot),
     }
@@ -126,6 +134,15 @@ async fn load_dual_slot_driver<G1: BankPins, G2: BankPins>(
         //     // it's impossible to have other modules in those slots, so the gpio banks are not returned
         //     Ok(())
         // }
+        Some(id) if id == qwertyxpansion_driver::QwertyDriver::ID => {
+            match qwertyxpansion_driver::QwertyDriver::create(banks, slots, registry, bus).await {
+                Ok(()) => defmt::info!("qwerty driver initialized in {:?}", slots),
+                Err(error) => {
+                    defmt::error!("qwerty driver init failed in {:?}: {:?}", slots, error)
+                }
+            }
+            Ok(()) 
+        }
         Some(_) | None => {
             defmt::warn!("no dual slot module found in slots: {:?}", slots.0);
             Err(banks)
