@@ -34,6 +34,8 @@ const HEAP_SIZE: usize = 64 * 1024;
 
 #[cortex_m_rt::entry]
 fn main() -> ! {
+    unsafe { cortex_m::Peripherals::steal().SCB.enable_fpu() };
+
     let p = embassy_rp::init(Default::default());
     info!("boot: RP235x peripherals initialized");
 
@@ -50,6 +52,8 @@ fn main() -> ! {
         p.CORE1,
         unsafe { &mut *core::ptr::addr_of_mut!(CORE1_STACK) },
         move || {
+            // Core 1 has its own CPACR; enable its FPU as well.
+            unsafe { cortex_m::Peripherals::steal().SCB.enable_fpu() };
             let executor1 = EXECUTOR1.init(Executor::new());
             executor1.run(|spawner| {
                 spawner.spawn(unwrap!(app_core_task(

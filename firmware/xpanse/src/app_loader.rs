@@ -6,26 +6,37 @@ use core::{future::Future, pin::Pin};
 use xpanse_api::{app::App, registry::Registry};
 
 const APP_CATALOG: &[AppDescriptor] = &[
+    #[cfg(feature = "app-doom")]
+    AppDescriptor {
+        name: doom_app::DoomApp::NAME,
+        can_run: doom_app::DoomApp::can_run,
+        run: run_app_impl::<doom_app::DoomApp>,
+    },
+    #[cfg(feature = "app-button-logger")]
     AppDescriptor {
         name: button_logger::ButtonLoggerApp::NAME,
         can_run: button_logger::ButtonLoggerApp::can_run,
         run: run_app_impl::<button_logger::ButtonLoggerApp>,
     },
+    #[cfg(feature = "app-cube-game")]
     AppDescriptor {
         name: cube_game::CubeGameApp::NAME,
         can_run: cube_game::CubeGameApp::can_run,
         run: run_app_impl::<cube_game::CubeGameApp>,
     },
+    #[cfg(feature = "app-neon-beat")]
     AppDescriptor {
         name: neon_beat::NeonBeatApp::NAME,
         can_run: neon_beat::NeonBeatApp::can_run,
         run: run_app_impl::<neon_beat::NeonBeatApp>,
     },
+    #[cfg(feature = "app-snake-game")]
     AppDescriptor {
         name: snake_game::SnakeGameApp::NAME,
         can_run: snake_game::SnakeGameApp::can_run,
         run: run_app_impl::<snake_game::SnakeGameApp>,
     },
+    #[cfg(feature = "app-nes-emulator")]
     AppDescriptor {
         name: nes_emulator::NesEmulatorApp::NAME,
         can_run: nes_emulator::NesEmulatorApp::can_run,
@@ -68,6 +79,7 @@ pub(crate) fn run_app<'a>(
     (app.run)(registry)
 }
 
+#[allow(dead_code)]
 fn run_app_impl<'a, A: App + 'static>(registry: &'a mut Registry) -> AppFuture<'a> {
     Box::pin(async move {
         if let Some(mut app) = A::new(registry) {

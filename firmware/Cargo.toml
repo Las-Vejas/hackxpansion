@@ -96,12 +96,15 @@ pio = "0.3"
 test-driver = { path = "./drivers/test-driver/" }
 two-button-driver = { path = "./drivers/two-button-driver/" }
 four-button-driver = { path = "./drivers/four-button-driver/" }
+wardriving-driver = "0.1.1"
+pn532-driver = "0.1.0"
 keebxpansion = "0.1.0"
 nfcxpansion = "0.1.1"
 qwertyxpansion-driver = "0.1.0"
 sensexpansion-driver = "0.1.0"
 
 # Apps
+doom-app = { version = "0.1.0" }
 button-logger = { path = "./apps/button-logger/" }
 cube-game = { path = "./apps/cube-game/" }
 neon-beat = { path = "./apps/neon-beat/" }

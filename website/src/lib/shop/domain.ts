@@ -16,14 +16,10 @@ export const HACKXPANSION_CONSOLE = {
 	price: 8,
 	imageUrl: '/shop/console.png',
 	requiredModuleDesigns: 4,
-	requiredAppDesigns: 1,
+	requiredAppDesigns: 0,
 	active: true,
 	sortOrder: 0
 } as const;
-
-export function isShopItemUnlocked(itemId: string, hasConsoleOrder: boolean) {
-	return itemId === HACKXPANSION_CONSOLE.id || hasConsoleOrder;
-}
 
 export function getShopEligibility(requirements: ShopRequirements, progress: ShopProgress) {
 	const missingModuleDesigns = Math.max(
