@@ -100,6 +100,8 @@ wardriving-driver = "0.1.1"
 pn532-driver = "0.1.0"
 keebxpansion = "0.1.0"
 nfcxpansion = "0.1.1"
+qwertyxpansion-driver = "0.1.0"
+sensexpansion-driver = "0.1.0"
 
 # Apps
 doom-app = { version = "0.1.0" }

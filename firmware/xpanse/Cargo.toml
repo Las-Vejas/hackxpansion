@@ -69,6 +69,8 @@ wardriving-driver = { workspace = true }
 pn532-driver = { workspace = true }
 keebxpansion = { workspace = true }
 nfcxpansion = { workspace = true }
+qwertyxpansion-driver = { workspace = true }
+sensexpansion-driver = { workspace = true }
 
 # Apps (each behind an `app-*` feature flag)
 doom-app = { workspace = true, optional = true }
